@@ -151,7 +151,12 @@ public class GameObjTracker : MonoBehaviour
         {
             foreach (ShipSettings ship in Ships)
             {
-                ship._CoreStrength = 0f;
+                if(ship.isPlayer) {
+                //    playerNeedsRespawn = true;
+                //    ship._CoreStrength = 0f;
+                } else {
+                    ship._CoreStrength = 0f;
+                }
             }
         }
     }
