@@ -9,11 +9,19 @@ public class HumanPlayer : MonoBehaviour
     ShipSettings ship;
     ProjectileWeapon[] laserCannons;
 
+    bool rolling = false;
+    float rollStart;
+    float rollDir;
+    float rollLength;
+    float barrelRef = 0f;
+    float barrelRoll;
+
 
     void Start()
     {
         ship = GetComponent<ShipSettings>();
         laserCannons = GetComponentsInChildren<ProjectileWeapon>();
+        Cursor.visible = false;
     }
 
     void Update()
@@ -31,12 +39,14 @@ public class HumanPlayer : MonoBehaviour
 
     void Throttle()
     {
-        var fullStop = Input.GetKey(KeyCode.Backspace);
-        var fullSpeed = Input.GetKey(KeyCode.Backslash);
-        var afterBurn = Input.GetKey(KeyCode.Tab);
-        var afterBurnOff = Input.GetKeyUp(KeyCode.Tab);
-        var accelerate = Input.GetKey(KeyCode.Equals) || Input.GetKey(KeyCode.KeypadPlus); // KeyCode.Equals is the plus key without modifier
-        var decelerate = Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus);
+        var fullStop = Input.GetKey(KeyCode.S);             // S for Stop
+        var fullSpeed = Input.GetKey(KeyCode.W);            // W for full speed ahead
+        var afterBurn = Input.GetKey(KeyCode.LeftShift);    // Shift for boost
+        var afterBurnOff = Input.GetKeyUp(KeyCode.LeftShift);
+        var accelerate = Input.GetKey(KeyCode.Q);     // Up arrow to accelerate
+        var decelerate = Input.GetKey(KeyCode.E);
+        var rollLeft = Input.GetKey(KeyCode.A);
+        var rollRight = Input.GetKey(KeyCode.D);
 
         if (afterBurnOff)
         {
@@ -70,6 +80,26 @@ public class HumanPlayer : MonoBehaviour
                 }
             }
         }
+        //if (rolling)
+        //{
+        //    DoABarrelRoll(rollDir, 3f);
+        //    return;
+        //}
+        //else StopRoll();
+
+
+        //if (rollLeft)
+        //{
+        //    rollStart = Time.time;
+        //    rolling = true;
+        //    rollDir = -1;
+        //}
+        //if (rollRight)
+        //{
+        //    rollStart = Time.time;
+        //    rollDir = 1;
+        //    rolling = true;
+        //}
 
     }
 
@@ -89,4 +119,23 @@ public class HumanPlayer : MonoBehaviour
             }
         }
     }
+
+    //void DoABarrelRoll(float direction, float length)
+    //{
+    //    print("ROLLING");
+    //    if (Time.time <= rollStart + length)
+    //    {
+    //        barrelRef = Mathf.SmoothStep(barrelRef, direction, .05f);
+    //    }
+    //    else
+    //    {
+    //        barrelRef = Mathf.Lerp(barrelRef, 0f, .05f);
+    //        rolling = false;
+    //    }
+    //    barrelRoll += barrelRef * ship.turnRate * Time.deltaTime;
+    //}
+    //void StopRoll()
+    //{
+    //    ship.roll = Mathf.SmoothStep(ship.roll, 0, .05f);
+    //}
 }

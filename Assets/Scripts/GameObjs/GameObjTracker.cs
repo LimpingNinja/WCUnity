@@ -23,6 +23,7 @@ public class GameObjTracker : MonoBehaviour
     public GameObject[] ConfedSpawn;
     public GameObject[] PirateSpawn;
     public bool randomPlayerSpawn = false;
+    public bool isPlayable = false;
     [HideInInspector] public int playerSpawnIndex = 0;
     public GameObject[] PlayerSpawn;
     public static int confedKills = 0;
@@ -37,12 +38,21 @@ public class GameObjTracker : MonoBehaviour
     static bool hasSetRandomLook = false;
     static Vector3 averageLoc = Vector3.zero;
 
+    private bool loopDisabled = false;
+
+    private int currentPlayerShipID = 0;
+    private bool cycle;
+    private ShipSettings playerShip;
+    [SerializeField] private SpawnRoot initPlayer;
+
     void Start()
     {
         Application.targetFrameRate = 60;
         Tracker = gameObject;
         RegisterAllShips();
         RegisterTeams();
+
+       if (initPlayer) playerShip = initPlayer.transform.parent.GetComponent<ShipSettings>();
     }
 
     public static void RegisterAllShips()
@@ -145,33 +155,37 @@ public class GameObjTracker : MonoBehaviour
         bracketRefreshNeeded = true;
         //print("Radar Refresh is: "+ radarRefreshNeeded);
     }
-    void KillAllShips() 
+    void DisableLoop()
     {
         if (Input.GetKeyDown(KeyCode.K))
         {
             foreach (ShipSettings ship in Ships)
             {
-                if(ship.isPlayer) {
-                //    playerNeedsRespawn = true;
-                //    ship._CoreStrength = 0f;
-                } else {
-                    ship._CoreStrength = 0f;
-                }
+                ship._CoreStrength = 0f;
             }
+            loopDisabled = !loopDisabled;
         }
     }
     void SpawnExtraShips()
     {
-        if (KilrathiSpawn.Length > 0 &&  KilrathiShips.Count < MaxShipsPerSideToSpawn && frames % 240 == 0)
+        if (KilrathiSpawn.Length > 0 && KilrathiShips.Count < MaxShipsPerSideToSpawn && frames % 240 == 0)
         {
+            if (loopDisabled)
+            {
+                return;
+            }
             int spawnIndex = Random.Range(0, KilrathiSpawn.Length);
             GameObject ship = Instantiate(KilrathiSpawn[spawnIndex], Random.onUnitSphere * 1200f, Quaternion.identity);
             ship.name = KilrathiSpawn[spawnIndex].name;
             radarRefreshNeeded = true;
             bracketRefreshNeeded = true;
         }
-        if (ConfedSpawn.Length > 0 &&  ConfedShips.Count < MaxShipsPerSideToSpawn && frames % 240 == 0)
+        if (ConfedSpawn.Length > 0 && ConfedShips.Count < MaxShipsPerSideToSpawn && frames % 240 == 0)
         {
+            if (loopDisabled)
+            {
+                return;
+            }
             int spawnIndex = Random.Range(0, ConfedSpawn.Length);
             GameObject ship = Instantiate(ConfedSpawn[spawnIndex], Random.onUnitSphere * 1200f, Quaternion.identity);
             ship.name = ConfedSpawn[spawnIndex].name;
@@ -180,6 +194,10 @@ public class GameObjTracker : MonoBehaviour
         }
         if (PirateSpawn.Length > 0 && PirateShips.Count < MaxShipsPerSideToSpawn && frames % 240 == 0)
         {
+            if (loopDisabled)
+            {
+                return;
+            }
             int spawnIndex = Random.Range(0, PirateSpawn.Length);
             GameObject ship = Instantiate(PirateSpawn[spawnIndex], Random.onUnitSphere * 1200f, Quaternion.identity);
             ship.name = PirateSpawn[spawnIndex].name;
@@ -198,22 +216,102 @@ public class GameObjTracker : MonoBehaviour
                 int RandomIndex = Mathf.RoundToInt(Random.Range(0, PlayerSpawn.Length));
                 if (!randomPlayerSpawn)
                 {
-                    RandomIndex = playerSpawnIndex;
+                    RandomIndex = playerSpawnIndex;                  
                 }
+                if (cycle)
+                {
+                    RandomIndex = currentPlayerShipID;
+                }
+
+                currentPlayerShipID = RandomIndex;
+
                 GameObject ship = Instantiate(PlayerSpawn[RandomIndex], Random.onUnitSphere * 200f, Quaternion.identity);
+
+                var spawnRoot = ship.GetComponent<SpawnRoot>();
+
+
+                if (isPlayable)
+                {
+                    spawnRoot.isPlayer = true;
+                    spawnRoot.SetPlayable();
+                }
+                
+
+                playerShip = ship.transform.parent.GetComponent<ShipSettings>();
+
                 ship.name = PlayerSpawn[RandomIndex].name;
                 radarRefreshNeeded = true;
                 bracketRefreshNeeded = true;
                 playerNeedsRespawn = false;
+                cycle = false;
             }
         }
     }
-    // Update is called once per frame
+
+    void CyclePlayerShip()
+    {
+        playerShip._CoreStrength = 0f;
+        cycle = true;
+        if (PlayerSpawn.Length > 0)
+        {
+            if (currentPlayerShipID == PlayerSpawn.Length - 1)
+            {
+                currentPlayerShipID = 0;
+            }
+            else
+            {
+                currentPlayerShipID++;
+            }
+        }
+
+    }
+
+    void AddAiShips()
+    {
+        var rnd = Random.Range(0, 3);
+        if (KilrathiSpawn.Length > 0 && rnd == 0)
+        {
+            int spawnIndex = Random.Range(0, KilrathiSpawn.Length);
+            GameObject ship = Instantiate(KilrathiSpawn[spawnIndex], Random.onUnitSphere * 1200f, Quaternion.identity);
+            ship.name = KilrathiSpawn[spawnIndex].name;
+            radarRefreshNeeded = true;
+            bracketRefreshNeeded = true;
+        }
+        if (ConfedSpawn.Length > 0 && rnd == 1)
+        {
+            int spawnIndex = Random.Range(0, ConfedSpawn.Length);
+            GameObject ship = Instantiate(ConfedSpawn[spawnIndex], Random.onUnitSphere * 1200f, Quaternion.identity);
+            ship.name = ConfedSpawn[spawnIndex].name;
+            radarRefreshNeeded = true;
+            bracketRefreshNeeded = true;
+        }
+        if (PirateSpawn.Length > 0 && rnd == 2)
+        {
+            int spawnIndex = Random.Range(0, PirateSpawn.Length);
+            GameObject ship = Instantiate(PirateSpawn[spawnIndex], Random.onUnitSphere * 1200f, Quaternion.identity);
+            ship.name = PirateSpawn[spawnIndex].name;
+            radarRefreshNeeded = true;
+            bracketRefreshNeeded = true;
+        }
+    }
+
+
     void Update()
     {
         frames++;
+
+        if (Input.GetKeyUp(KeyCode.LeftBracket))
+        {
+            CyclePlayerShip();
+        }
+        if (Input.GetKeyUp(KeyCode.RightBracket))
+        {
+            AddAiShips();
+        }
+
+
         CheckDestroyedEnemies();
-        KillAllShips();
+        DisableLoop();
         SpawnExtraShips();
         if (playerNeedsRespawn)
         {

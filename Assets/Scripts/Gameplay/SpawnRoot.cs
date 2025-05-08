@@ -8,20 +8,27 @@ public class SpawnRoot : MonoBehaviour
     public bool isPlayer;
     public AIPlayer.AILevel aiLevel;
     public MessageHandler messageOverride;
-    // Start is called before the first frame update
-    void Start()
+
+
+
+    public void Awake()
     {
-        GameObject root = Instantiate(SpawnParent,transform.position, transform.rotation);
+        GameObject root = Instantiate(SpawnParent, transform.position, transform.rotation);
         transform.parent = root.transform;
         root.name = SpawnParent.name;
         root.GetComponent<AIPlayer>().AISkillLevel = aiLevel;
         root.GetComponent<ShipSettings>().isPlayer = true;
         root.GetComponent<ShipSettings>().playerUI = this.gameObject;
-        if (isPlayer)
+        if (isPlayer) SetPlayable();
+    }
+    public void SetPlayable()
+    {
+        if (!transform.parent) return;
+       if (transform.parent.TryGetComponent(out AIPlayer ship))
         {
-            root.GetComponent<AIPlayer>().enabled = false;
-            root.GetComponent<KeyPlayer>().enabled = false;
+            ship.enabled = false;
+            ship.gameObject.AddComponent<HumanPlayer>();
         }
-       
+
     }
 }

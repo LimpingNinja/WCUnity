@@ -95,6 +95,7 @@ public class CockpitViewSwitcher : MonoBehaviour
     }
     void DoChaseCam()
     {
+        /*
         if (Billboard && !Billboard.activeInHierarchy)
         {
             HoverUI.SetActive(true);
@@ -115,6 +116,7 @@ public class CockpitViewSwitcher : MonoBehaviour
             //duck and muffle the music! 
             MusicController.ExteriorCam = true;
         }
+        */
         //disable hover UI if there's no billboard (IE, we've been destroyed)
         if (Billboard == null)
         {
