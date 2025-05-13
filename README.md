@@ -1,7 +1,7 @@
 # WCUnity
 Bare-bones remake of Wc1 in Unity
 
-**🎮 Gameplay / Changes to original Demo **
+## 🎮 Gameplay / Changes to original Demo
 
 To simplify gameplay state transitions and provide a clean loop for testing or in-game logic, a \`RollingUpdate()\` method was introduced. This method replaces the deprecated \`Killallships()\` functionality. From the main menu if you wait it moves into rolling demo, you can exit that with 'ESC' key. Clicking on the first item in the menu is the playable rolling demo (also exitable with 'ESC' key).
 
