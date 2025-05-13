@@ -132,5 +132,5 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MotionVectors: {r: -0.96805155, g: -0.9000945, b: 0.0879039, a: 0}
+    - _MotionVectors: {r: 0.02842433, g: 0.08121675, b: 0.3314525, a: 0}
   m_BuildTextureStacks: []
